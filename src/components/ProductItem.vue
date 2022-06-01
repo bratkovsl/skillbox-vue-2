@@ -16,7 +16,7 @@
 
     <ul class="colors colors--black">
       <!--            eslint-disable-next-line-->
-      <li class="colors__item" v-for="colorId in product.colorIds">
+      <li class="colors__item" v-for="colorId in product.colorIds" :key="colorId">
         <!--            eslint-disable-next-line-->
         <label class="colors__label">
           <input class="colors__radio sr-only" type="radio"

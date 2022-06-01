@@ -136,12 +136,10 @@ export default {
       this.currentPriceTo = value;
     },
     categoryId(value) {
-      console.log(value);
       this.currentCategoryId = value;
     },
     colorId(value) {
       this.currentColorId = value;
-      console.log(value);
     },
   },
   methods: {
