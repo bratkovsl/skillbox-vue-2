@@ -3,7 +3,7 @@ export default [
     id: 1,
     categoryId: 2,
     title: 'Радионяня Motorola MBP16 ',
-    price: 100,
+    price: 3200,
     image: '/img/radio.jpg',
     colorIds: [1],
   },
