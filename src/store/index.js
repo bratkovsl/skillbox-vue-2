@@ -53,7 +53,8 @@ export default new Vuex.Store({
       return getters.cartDetailProducts.reduce((acc, item) => (item.product.price * item.amount) + acc, 0);
     },
     cartProductAmount(state, getters) {
-      return getters.cartDetailProducts.length;
+      return getters.cartDetailProducts.reduce((acc, item) => (item.amount) + acc, 0);
+      // return getters.cartDetailProducts.length; только товары
     },
   },
 });
