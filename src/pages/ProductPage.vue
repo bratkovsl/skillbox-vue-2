@@ -1,5 +1,7 @@
 <template>
-  <main class="content container">
+  <main class="content container" v-if="productsLoading">Загрузка товара...</main>
+  <main class="content container" v-else-if="!productData">Ошибка при загрузке товара</main>
+  <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -14,7 +16,7 @@
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
-            {{ product.title }}
+            {{ productData.title }}
           </a>
         </li>
       </ul>
@@ -23,20 +25,20 @@
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
-          <img width="570" height="570" :src="product.image"
-               :alt="product.title">
+          <img width="570" height="570" :src="productData.image.file.url"
+               :alt="productData.title">
         </div>
       </div>
 
       <div class="item__info">
-        <span class="item__code">Артикул: {{ product.id }}</span>
+        <span class="item__code">Артикул: {{ productData.id }}</span>
         <h2 class="item__title">
-          {{ product.title }}
+          {{ productData.title }}
         </h2>
         <div class="item__form">
           <form class="form" action="#" method="POST" @submit.prevent="addToCart">
             <b class="item__price">
-              {{ product.price | numberFormat }} ₽
+              {{ productData.price | numberFormat }} ₽
             </b>
 
             <fieldset class="form__block">
@@ -107,7 +109,7 @@
             </fieldset>
 
             <div class="item__row">
-              <ProductAmount :value.sync="productAmount" />
+              <ProductAmount :value.sync="productAmount"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -184,25 +186,28 @@
   </main>
 </template>
 <script>
-import products from '@/data/products';
-import categories from '@/data/categories';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import ProductAmount from '@/components/ProductAmount.vue';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
 export default {
   components: { ProductAmount },
   data() {
     return {
       productAmount: 1,
+      productData: null,
+      productLoadingFailed: false,
+      productsLoading: false,
     };
   },
   computed: {
-    product() {
-      return products.find((product) => product.id === +this.$route.params.id);
+    products() {
+      return this.productData;
     },
     category() {
-      return categories.find((category) => category.id === this.product.categoryId);
+      return this.productData.category;
     },
   },
   filters: {
@@ -213,8 +218,30 @@ export default {
     addToCart() {
       this.$store.commit(
         'addProductToCart',
-        { productId: this.product.id, amount: this.productAmount },
+        {
+          productId: this.product.id,
+          amount: this.productAmount,
+        },
       );
+    },
+    loadProduct() {
+      this.productsLoading = true;
+      this.productLoadingFailed = false;
+      axios.get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
+        // eslint-disable-next-line
+        .then(response => this.productData = response.data)
+        // eslint-disable-next-line no-return-assign
+        .catch(() => this.productLoadingFailed = true)
+        // eslint-disable-next-line
+        .then(() => this.productsLoading = false);
+    },
+  },
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.loadProduct();
+      },
+      immediate: true,
     },
   },
 };
