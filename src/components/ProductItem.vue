@@ -16,14 +16,14 @@
 
     <ul class="colors colors--black">
       <!--            eslint-disable-next-line-->
-      <li class="colors__item" v-for="colorId in product.colorIds" :key="colorId">
+      <li class="colors__item" v-for="c in product.colors" :key="c.id">
         <!--            eslint-disable-next-line-->
         <label class="colors__label">
           <input class="colors__radio sr-only" type="radio"
-                 :value="getColor(colorId)"
+                 :value="c.code"
                  v-model="color">
           <span class="colors__value"
-                :style="{backgroundColor: getColor(colorId)}">
+                :style="{backgroundColor: c.code}">
                   </span>
         </label>
       </li>
@@ -36,10 +36,10 @@ import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 
 export default {
-  props: ['product', 'colors'],
+  props: ['product'],
   data() {
     return {
-      color: this.getColor(this.product.colorIds[0]),
+      color: this.product.colors[0].code,
     };
   },
   filters: {
@@ -47,10 +47,6 @@ export default {
   },
   methods: {
     gotoPage,
-    getColor(id) {
-      const v = this.colors.filter((color) => color.id === id);
-      return v[0].value;
-    },
   },
 };
 </script>

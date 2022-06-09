@@ -12,14 +12,14 @@
     <div class="content__catalog">
       <ProductFilter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo"
                      :category-id.sync="filterCategoryId" :color-id.sync="filterColorId"
-                     :colors="colors"/>
+                     :colors="colorsData"/>
 
       <section class="catalog">
-        <div v-if="productsLoading">Загрузка товаров...</div>
+        <BaseLoader v-if="productsLoading" />
         <div v-if="productsLoadingFailed">Ошибка при загрузке товаров
           <button @click.prevent="loadProducts">Попробовать еще раз</button>
         </div>
-        <ProductList :products="products" :colors="colors"/>
+        <ProductList :products="products"/>
         <BasePagination v-model="page" :count="countProducts" :per-page="productsPerPage"/>
       </section>
     </div>
@@ -27,15 +27,16 @@
 </template>
 
 <script>
-import colors from '@/data/colors';
 import ProductList from '@/components/ProductList.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
+import BaseLoader from '@/components/BaseLoader.vue';
 
 export default {
   components: {
+    BaseLoader,
     ProductFilter,
     ProductList,
     BasePagination,
@@ -48,7 +49,7 @@ export default {
       filterColorId: '',
       page: 1,
       productsPerPage: 3,
-      colors,
+      colorsData: null,
       productsData: null,
       productsLoading: false,
       productsLoadingFailed: false,
@@ -71,10 +72,6 @@ export default {
     },
   },
   methods: {
-    // getColorId(hex) {
-    //   const c = this.colors.filter((color) => color.value === hex);
-    //   return c[0].id;
-    // },
     loadProducts() {
       this.productsLoading = true;
       this.productsLoadingFailed = false;
@@ -98,6 +95,14 @@ export default {
           .then(() => this.productsLoading = false);
       }, 0);
     },
+    loadColors() {
+      return axios.get(`${API_BASE_URL}/api/colors`)
+        // eslint-disable-next-line
+        .then(response => {
+          console.log(response.data.items);
+          this.colorsData = response.data.items;
+        });
+    },
   },
   watch: {
     page() {
@@ -112,9 +117,14 @@ export default {
     filterCategoryId() {
       this.loadProducts();
     },
+    filterColorId() {
+      console.log(this.filterColorId);
+      this.loadProducts();
+    },
   },
   created() {
     this.loadProducts();
+    this.loadColors();
   },
 };
 </script>

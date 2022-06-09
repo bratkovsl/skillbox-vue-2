@@ -10,30 +10,18 @@ export default new Vuex.Store({
     cartProducts: [],
     userAccessKey: null,
     cartProductsData: [],
+    cartSpinner: true,
   },
   mutations: {
-    addProductToCart(state, { productId, amount }) {
-      // eslint-disable-next-line
-      const item = state.cartProducts.find(item => item.productId === productId);
-      if (item) {
-        item.amount += amount;
-      } else {
-        state.cartProducts.push({
-          productId,
-          amount,
-        });
-      }
-    },
-    updateCartProductAmount(state, { productId, amount }) {
+    updateCartProductAmount(state, {
+      productId,
+      amount,
+    }) {
       // eslint-disable-next-line
       const item = state.cartProducts.find(item => item.productId === productId);
       if (item) {
         item.amount = amount;
       }
-    },
-    deleteCartProduct(state, productId) {
-      // eslint-disable-next-line
-      state.cartProducts = state.cartProducts.filter(item => item.productId !== productId);
     },
     updateUserAccessKey(state, accessKey) {
       state.userAccessKey = accessKey;
@@ -49,6 +37,9 @@ export default new Vuex.Store({
           amount: item.quantity,
         };
       });
+    },
+    updateCartSpinner(state, status) {
+      state.cartSpinner = status;
     },
   },
   getters: {
@@ -76,7 +67,7 @@ export default new Vuex.Store({
   },
   actions: {
     loadCart(context) {
-      axios.get(`${API_BASE_URL}/api/baskets`, {
+      return axios.get(`${API_BASE_URL}/api/baskets`, {
         params: {
           userAccessKey: context.state.userAccessKey,
         },
@@ -88,6 +79,87 @@ export default new Vuex.Store({
           }
           context.commit('updateCartProductsData', response.data.items);
           context.commit('syncCartProducts');
+          context.commit('updateCartSpinner', false);
+        });
+    },
+    addProductToCart(context, {
+      productId,
+      amount,
+    }) {
+      // eslint-disable-next-line no-promise-executor-return
+      return (new Promise((resolve) => setTimeout(resolve, 0)))
+        // eslint-disable-next-line
+        .then(() => {
+          return axios
+            .post(`${API_BASE_URL}/api/baskets/products`, {
+              // eslint-disable-next-line
+              productId: productId,
+              quantity: amount,
+            }, {
+              params: {
+                userAccessKey: context.state.userAccessKey,
+              },
+            })
+            // eslint-disable-next-line
+            .then(response => {
+              context.commit('updateCartProductsData', response.data.items);
+              context.commit('syncCartProducts');
+            });
+        });
+    },
+    updateCartProductAmount(context, {
+      productId,
+      amount,
+    }) {
+      context.commit('updateCartProductAmount', {
+        productId,
+        amount,
+      });
+      if (amount < 1) {
+        return;
+      }
+
+      // eslint-disable-next-line consistent-return
+      return axios
+        .put(`${API_BASE_URL}/api/baskets/products`, {
+          // eslint-disable-next-line
+          productId: productId,
+          quantity: amount,
+        }, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        // eslint-disable-next-line
+        .then(response => {
+          context.commit('updateCartProductsData', response.data.items);
+        })
+        .catch(() => {
+          context.commit('syncCartProducts');
+        });
+    },
+    // eslint-disable-next-line
+    deleteProductCart(context, { productId }) {
+      // eslint-disable-next-line no-promise-executor-return
+      return (new Promise((resolve) => setTimeout(resolve, 0)))
+        // eslint-disable-next-line
+        .then(() => {
+          return axios
+            .delete(`${API_BASE_URL}/api/baskets/products?userAccessKey=${context.state.userAccessKey}`, {
+              data: {
+                productId,
+              },
+            })
+            // eslint-disable-next-line
+            .then(response => {
+              console.log(response);
+              context.commit('updateCartProductsData', response.data.items);
+              context.commit('syncCartProducts');
+            })
+            .catch((error) => {
+              console.log(error);
+              context.commit('syncCartProducts');
+            });
         });
     },
   },

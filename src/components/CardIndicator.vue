@@ -1,5 +1,6 @@
 <template>
-  <router-link class="header__cart" :to="{name: 'cart'}" aria-label="Корзина с товарами">
+  <BaseLoader style="top: -20px;" v-if="$store.state.cartSpinner" />
+  <router-link v-else class="header__cart" :to="{name: 'cart'}" aria-label="Корзина с товарами">
     <svg width="30" height="21" fill="currentColor">
       <use xlink:href="#icon-cart"></use>
     </svg>
@@ -10,5 +11,9 @@
 </template>
 
 <script>
-export default {};
+import BaseLoader from '@/components/BaseLoader.vue';
+
+export default {
+  components: { BaseLoader },
+};
 </script>

@@ -19,21 +19,21 @@
       </h1>
       <span class="content__info">
 <!--        eslint-disable-next-line -->
-        {{ productCounter }} {{ numWord(productCounter,['товар', 'товара', 'товаров']) }}
+        {{ productCounter }} {{ numWord(productCounter, ['товар', 'товара', 'товаров']) }}
       </span>
     </div>
-
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST">
+      <BaseLoader v-if="$store.state.cartSpinner" />
+      <form v-else class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <ul class="cart__list">
-            <CartItem :item="item" v-for="item in products" :key="item.productId" />
+            <CartItem :item="item" v-for="item in products" :key="item.productId"/>
           </ul>
         </div>
 
         <div class="cart__block">
           <p class="cart__desc">
-            Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
+            Мы посчитаем стоимость доставки на следующем этапе
           </p>
           <p class="cart__price">
             Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
@@ -53,9 +53,10 @@ import numberFormat from '@/helpers/numberFormat';
 import numWord from '@/helpers/numWord';
 import { mapGetters } from 'vuex';
 import CartItem from '@/components/CartItem.vue';
+import BaseLoader from '@/components/BaseLoader.vue';
 
 export default {
-  components: { CartItem },
+  components: { BaseLoader, CartItem },
   data() {
     return {
       numWord,
@@ -65,7 +66,11 @@ export default {
     numberFormat,
   },
   computed: {
-    ...mapGetters({ products: 'cartDetailProducts', totalPrice: 'cartTotalPrice', productCounter: 'cartProductAmount' }),
+    ...mapGetters({
+      products: 'cartDetailProducts',
+      totalPrice: 'cartTotalPrice',
+      productCounter: 'cartProductAmount',
+    }),
   },
 };
 </script>
