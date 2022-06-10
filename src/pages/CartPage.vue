@@ -23,7 +23,7 @@
       </span>
     </div>
     <section class="cart">
-      <BaseLoader v-if="$store.state.cartSpinner" />
+      <BaseLoader v-if="$store.state.cartSpinner"/>
       <form v-else class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <ul class="cart__list">
@@ -39,9 +39,11 @@
             Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
           </p>
 
-          <button class="cart__button button button--primery" type="submit">
+          <router-link tag="button" :to="{name:'order'}" :disabled="productCounter===0"
+                       class="cart__button button button--primery"
+                       type="submit">
             Оформить заказ
-          </button>
+          </router-link>
         </div>
       </form>
     </section>
@@ -56,7 +58,10 @@ import CartItem from '@/components/CartItem.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
 
 export default {
-  components: { BaseLoader, CartItem },
+  components: {
+    BaseLoader,
+    CartItem,
+  },
   data() {
     return {
       numWord,
