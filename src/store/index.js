@@ -12,12 +12,8 @@ export default new Vuex.Store({
     cartProductsData: [],
     cartSpinner: true,
     orderInfo: null,
-    shippingPrice: 0,
   },
   mutations: {
-    updateShippingPrice(state, shippingPrice) {
-      state.shippingPrice = shippingPrice;
-    },
     updateOrderInfo(state, orderInfo) {
       state.orderInfo = orderInfo;
     },

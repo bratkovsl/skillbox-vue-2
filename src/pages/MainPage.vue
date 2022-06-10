@@ -99,7 +99,6 @@ export default {
       return axios.get(`${API_BASE_URL}/api/colors`)
         // eslint-disable-next-line
         .then(response => {
-          console.log(response.data.items);
           this.colorsData = response.data.items;
         });
     },
