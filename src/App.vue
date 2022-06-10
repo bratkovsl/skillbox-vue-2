@@ -5,7 +5,7 @@
         <span class="header__info">Каталог</span>
 
         <a class="header__logo" href="#">
-          <img src="/img/svg/logo-tech.svg" alt="Логотип интернет магазина Технозавррр"
+          <img src="img/svg/logo-tech.svg" alt="Логотип интернет магазина Технозавррр"
                width="190"
                height="33">
         </a>
